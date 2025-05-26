@@ -839,27 +839,24 @@ const Clients = () => {
                   </tr>
                 ))
               </tbody>
-
-                ))}
-
+            </table>
           </div>
 
-            </table>
-            {finalClients.length === 0 && (
-              <div className="text-center py-12">
-                <ApperIcon name="Users" className="h-12 w-12 text-surface-400 mx-auto mb-4" />
-                <p className="text-surface-500 dark:text-surface-400">
-                  {searchTerm || filterStatus !== 'all' 
-                    ? 'No clients match your search criteria' 
-                    : 'No clients found. Add your first client to get started.'
-                  }
-                </p>
-              </div>
-            )}
+
+          {finalClients.length === 0 && (
+            <div className="text-center py-12">
+              <ApperIcon name="Users" className="h-12 w-12 text-surface-400 mx-auto mb-4" />
+              <p className="text-surface-500 dark:text-surface-400">
+                {searchTerm || filterStatus !== 'all' 
+                  ? 'No clients match your search criteria' 
+                  : 'No clients found. Add your first client to get started.'
+                }
+              </p>
+            </div>
+          )}
 
           {/* Context Menu */}
           <ColumnContextMenu />
-
 
           {/* Instructions */}
           <div className="p-4 bg-surface-50 dark:bg-surface-700 border-t border-surface-200 dark:border-surface-600">
@@ -868,7 +865,6 @@ const Clients = () => {
               <p><strong>Keyboard shortcuts:</strong> Enter to edit/save, Escape to cancel, Tab/Shift+Tab to navigate</p>
               <p><strong>Column operations:</strong> Right-click any column header to sort, hide, freeze, or manage columns</p>
             </div>
-
           </div>
         </motion.div>
       </div>
