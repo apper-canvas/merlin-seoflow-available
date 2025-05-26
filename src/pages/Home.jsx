@@ -17,6 +17,8 @@ const Home = () => {
     { id: 'clients', label: 'Clients', icon: 'Users' },
     { id: 'projects', label: 'Projects', icon: 'FolderOpen' },
     { id: 'deals', label: 'Deals', icon: 'Target' },
+    { id: 'leaderboard', label: 'Leaderboard', icon: 'Trophy' },
+
     { id: 'keywords', label: 'Keywords', icon: 'Search' },
     { id: 'reports', label: 'Reports', icon: 'FileText' }
   ]
@@ -57,9 +59,12 @@ const Home = () => {
                   onClick={() => {
                     if (item.id === 'deals') {
                       window.location.href = '/deals'
+                    } else if (item.id === 'leaderboard') {
+                      window.location.href = '/leaderboard'
                     } else {
                       setActiveSection(item.id)
                     }
+
                   }}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
                     activeSection === item.id
