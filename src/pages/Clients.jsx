@@ -168,9 +168,10 @@ const Clients = () => {
       
       if (clientIndex !== -1) {
         const updatedClients = [...clients]
+        const column = columns.find(col => col.key === columnKey)
         
         let value = editValue
-        if (column.type === 'number') {
+        if (column && column.type === 'number') {
           value = parseFloat(editValue) || 0
         }
         
@@ -187,6 +188,8 @@ const Clients = () => {
       setEditValue('')
     }
   }
+
+
 
   // Sort clients based on current sort settings
   const sortedClients = [...filteredClients].sort((a, b) => {
@@ -330,15 +333,70 @@ const Clients = () => {
     const isEditing = editingCell === cellId
     const value = client[column.key]
 
-
-  const finalClients = sortedClients
-
-
-      
-      setEditingCell(null)
-      setEditValue('')
-    }
+    return (
+      <td
+        key={column.key}
+        className={`sheets-cell ${
+          isSelected ? 'selected' : ''
+        } ${
+          isEditing ? 'editing' : ''
+        } ${
+          column.frozen ? 'column-frozen' : ''
+        }`}
+        style={{ width: column.width }}
+        onClick={() => handleCellClick(rowIndex, column.key)}
+        onDoubleClick={() => startEditing(rowIndex, column.key)}
+      >
+        {isEditing ? (
+          column.type === 'select' ? (
+            <select
+              ref={inputRef}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={stopEditing}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') stopEditing()
+                if (e.key === 'Escape') {
+                  setEditingCell(null)
+                  setEditValue('')
+                }
+              }}
+              className="w-full bg-transparent border-none outline-none"
+            >
+              {column.options.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              ref={inputRef}
+              type={column.type}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={stopEditing}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') stopEditing()
+                if (e.key === 'Escape') {
+                  setEditingCell(null)
+                  setEditValue('')
+                }
+              }}
+              className="w-full bg-transparent border-none outline-none"
+            />
+          )
+        ) : (
+          <span>
+            {column.type === 'number' && column.key === 'value' 
+              ? `$${Number(value).toLocaleString()}` 
+              : String(value || '')
+            }
+          </span>
+        )}
+      </td>
+    )
   }
+
+
 
   const handleKeyDown = (e) => {
     if (!selectedCell) return
@@ -469,67 +527,6 @@ const Clients = () => {
     a.click()
     window.URL.revokeObjectURL(url)
     toast.success('Data exported successfully')
-  }
-    return (
-      <td
-        key={column.key}
-        className={`sheets-cell ${
-          isSelected ? 'selected' : ''
-        } ${
-          isEditing ? 'editing' : ''
-        } ${
-          column.frozen ? 'column-frozen' : ''
-        }`}
-        style={{ width: column.width }}
-        onClick={() => handleCellClick(rowIndex, column.key)}
-        onDoubleClick={() => startEditing(rowIndex, column.key)}
-      >
-        {isEditing ? (
-          column.type === 'select' ? (
-            <select
-              ref={inputRef}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={stopEditing}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') stopEditing()
-                if (e.key === 'Escape') {
-                  setEditingCell(null)
-                  setEditValue('')
-                }
-              }}
-              className="w-full bg-transparent border-none outline-none"
-            >
-              {column.options.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-          ) : (
-            <input
-              ref={inputRef}
-              type={column.type}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={stopEditing}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') stopEditing()
-                if (e.key === 'Escape') {
-                  setEditingCell(null)
-                  setEditValue('')
-                }
-              }}
-            />
-          )
-        ) : (
-          <span>
-            {column.type === 'number' && column.key === 'value' 
-              ? `$${Number(value).toLocaleString()}` 
-              : String(value || '')
-            }
-          </span>
-        )}
-      </td>
-    )
   }
 
   // Column Context Menu Component
@@ -783,6 +780,8 @@ const Clients = () => {
                     />
                   </th>
                   {visibleColumns.map((column) => (
+                    <th
+
 
                       key={column.key} 
                       className={`sheets-header ${
@@ -821,6 +820,8 @@ const Clients = () => {
                 </tr>
               </thead>
               <tbody>
+                {finalClients.map((client, rowIndex) => (
+
 
                   <tr 
                     key={client.id}
@@ -850,7 +851,6 @@ const Clients = () => {
                 </p>
               </div>
             )}
-
 
           {/* Context Menu */}
           <ColumnContextMenu />
