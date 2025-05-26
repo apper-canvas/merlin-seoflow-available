@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import MainFeature from '../components/MainFeature'
+import Clients from './Clients'
+
 import Deals from './Deals'
 import Leaderboard from './Leaderboard'
 
@@ -215,14 +217,11 @@ const Home = () => {
           )}
 
           {activeSection === 'clients' && (
-            <main className="p-4 lg:p-8">
-              <div className="bg-white dark:bg-surface-800 rounded-2xl p-8 shadow-card border border-surface-200 dark:border-surface-700 text-center">
-                <ApperIcon name="Users" className="h-16 w-16 text-surface-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">Clients Management</h3>
-                <p className="text-surface-500 dark:text-surface-400">Client management features coming soon</p>
-              </div>
-            </main>
+            <div className="h-full">
+              <Clients />
+            </div>
           )}
+
 
           {activeSection === 'projects' && (
             <main className="p-4 lg:p-8">

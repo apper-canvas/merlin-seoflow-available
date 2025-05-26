@@ -275,4 +275,233 @@
     font-size: 2.25rem;
     line-height: 2.5rem;
   }
+
+/* Google Sheets-like table styles */
+.sheets-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sheets-cell {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  position: relative;
+  background: white;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheets-cell:hover {
+  background: #f8f9fa;
+}
+
+.sheets-cell.selected {
+  background: #e3f2fd;
+  border: 2px solid #1976d2;
+  z-index: 1;
+}
+
+.sheets-cell.editing {
+  background: white;
+  border: 2px solid #1976d2;
+  z-index: 2;
+}
+
+.sheets-cell input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0;
+}
+
+.sheets-header {
+  background: #f5f5f5;
+  font-weight: 600;
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.sheets-row-number {
+  background: #f5f5f5;
+  font-weight: 600;
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: center;
+  min-width: 50px;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.sheets-container {
+  overflow: auto;
+  max-height: calc(100vh - 200px);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.sheets-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
+  flex-wrap: wrap;
+}
+
+.sheets-toolbar button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sheets-toolbar button:hover {
+  background: #f0f0f0;
+  border-color: #ccc;
+}
+
+.sheets-toolbar button:active {
+  background: #e0e0e0;
+}
+
+.sheets-toolbar button.danger {
+  color: #d32f2f;
+  border-color: #ffcdd2;
+}
+
+.sheets-toolbar button.danger:hover {
+  background: #ffebee;
+  border-color: #ef5350;
+}
+
+.sheets-toolbar button.primary {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+}
+
+.sheets-toolbar button.primary:hover {
+  background: #1565c0;
+}
+
+/* Dark mode styles for sheets */
+.dark .sheets-table {
+  background: #1e293b;
+}
+
+.dark .sheets-cell {
+  background: #1e293b;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.dark .sheets-cell:hover {
+  background: #334155;
+}
+
+.dark .sheets-cell.selected {
+  background: #1e40af;
+  border-color: #3b82f6;
+}
+
+.dark .sheets-cell.editing {
+  background: #1e293b;
+  border-color: #3b82f6;
+}
+
+.dark .sheets-header {
+  background: #334155;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.dark .sheets-row-number {
+  background: #334155;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.dark .sheets-container {
+  border-color: #475569;
+}
+
+.dark .sheets-toolbar {
+  background: #334155;
+  border-color: #475569;
+}
+
+.dark .sheets-toolbar button {
+  background: #1e293b;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.dark .sheets-toolbar button:hover {
+  background: #475569;
+}
+
+/* Resizable columns */
+.column-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 5;
+}
+
+.column-resizer:hover {
+  background: #1976d2;
+}
+
+/* Selection styles */
+.row-selected {
+  background: #e3f2fd !important;
+}
+
+.dark .row-selected {
+  background: #1e40af !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sheets-cell {
+    min-width: 100px;
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+  
+  .sheets-toolbar {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .sheets-toolbar button {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
 }
