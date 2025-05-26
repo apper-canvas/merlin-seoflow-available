@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import MainFeature from '../components/MainFeature'
+import Deals from './Deals'
+import Leaderboard from './Leaderboard'
+
 import ApperIcon from '../components/ApperIcon'
 
 const Home = () => {
@@ -56,16 +59,7 @@ const Home = () => {
               {menuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    if (item.id === 'deals') {
-                      window.location.href = '/deals'
-                    } else if (item.id === 'leaderboard') {
-                      window.location.href = '/leaderboard'
-                    } else {
-                      setActiveSection(item.id)
-                    }
-
-                  }}
+                  onClick={() => setActiveSection(item.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
                     activeSection === item.id
                       ? 'bg-primary text-white shadow-card'
@@ -126,55 +120,139 @@ const Home = () => {
             </div>
           </header>
 
-          {/* Dashboard Content */}
-          <main className="p-4 lg:p-8 space-y-6 lg:space-y-8">
-            
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-              {kpiCards.map((kpi, index) => (
-                <motion.div
-                  key={kpi.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white dark:bg-surface-800 rounded-2xl p-6 shadow-card border border-surface-200 dark:border-surface-700"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      kpi.color === 'blue' ? 'bg-blue-100 dark:bg-blue-900/20' :
-                      kpi.color === 'green' ? 'bg-green-100 dark:bg-green-900/20' :
-                      kpi.color === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/20' :
-                      'bg-purple-100 dark:bg-purple-900/20'
-                    }`}>
-                      <ApperIcon 
-                        name={kpi.icon} 
-                        className={`h-6 w-6 ${
-                          kpi.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
-                          kpi.color === 'green' ? 'text-green-600 dark:text-green-400' :
-                          kpi.color === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
-                          'text-purple-600 dark:text-purple-400'
-                        }`} 
-                      />
+          {/* Dynamic Content */}
+          {activeSection === 'dashboard' && (
+            <main className="p-4 lg:p-8 space-y-6 lg:space-y-8">
+              
+              {/* KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                {kpiCards.map((kpi, index) => (
+                  <motion.div
+                    key={kpi.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-white dark:bg-surface-800 rounded-2xl p-6 shadow-card border border-surface-200 dark:border-surface-700"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                        kpi.color === 'blue' ? 'bg-blue-100 dark:bg-blue-900/20' :
+                        kpi.color === 'green' ? 'bg-green-100 dark:bg-green-900/20' :
+                        kpi.color === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/20' :
+                        'bg-purple-100 dark:bg-purple-900/20'
+                      }`}>
+                        <ApperIcon 
+                          name={kpi.icon} 
+                          className={`h-6 w-6 ${
+                            kpi.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                            kpi.color === 'green' ? 'text-green-600 dark:text-green-400' :
+                            kpi.color === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+                            'text-purple-600 dark:text-purple-400'
+                          }`} 
+                        />
+                      </div>
+                      <span className={`text-sm font-semibold ${
+                        kpi.trend === 'up' ? 'text-green-600' : 'text-red-500'
+                      }`}>
+                        {kpi.change}
+                      </span>
                     </div>
-                    <span className={`text-sm font-semibold ${
-                      kpi.trend === 'up' ? 'text-green-600' : 'text-red-500'
-                    }`}>
-                      {kpi.change}
-                    </span>
-                  </div>
-                  <h3 className="text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">
-                    {kpi.title}
-                  </h3>
-                  <p className="text-2xl lg:text-3xl font-bold text-surface-900 dark:text-white">
-                    {kpi.value}
-                  </p>
-                </motion.div>
-              ))}
+                    <h3 className="text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">
+                      {kpi.title}
+                    </h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-surface-900 dark:text-white">
+                      {kpi.value}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Main Feature Component */}
+              <MainFeature />
+
+              {/* Quick Actions */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="bg-white dark:bg-surface-800 rounded-2xl p-6 lg:p-8 shadow-card border border-surface-200 dark:border-surface-700"
+              >
+                <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-6">Quick Actions</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[
+                    { title: 'New Client', icon: 'UserPlus', color: 'bg-blue-500' },
+                    { title: 'Create Project', icon: 'Plus', color: 'bg-green-500' },
+                    { title: 'Add Keywords', icon: 'Search', color: 'bg-yellow-500' },
+                    { title: 'Generate Report', icon: 'FileText', color: 'bg-purple-500' }
+                  ].map((action) => (
+                    <button
+                      key={action.title}
+                      className="flex flex-col items-center p-6 rounded-xl border-2 border-dashed border-surface-300 dark:border-surface-600 hover:border-primary hover:bg-primary/5 transition-all duration-200 group"
+                    >
+                      <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                        <ApperIcon name={action.icon} className="h-6 w-6 text-white" />
+                      </div>
+                      <span className="font-medium text-surface-700 dark:text-surface-300 group-hover:text-primary transition-colors">
+                        {action.title}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </main>
+          )}
+
+          {activeSection === 'deals' && (
+            <div className="h-full">
+              <Deals />
             </div>
+          )}
 
-            {/* Main Feature Component */}
-            <MainFeature />
+          {activeSection === 'leaderboard' && (
+            <div className="h-full">
+              <Leaderboard />
+            </div>
+          )}
 
+          {activeSection === 'clients' && (
+            <main className="p-4 lg:p-8">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl p-8 shadow-card border border-surface-200 dark:border-surface-700 text-center">
+                <ApperIcon name="Users" className="h-16 w-16 text-surface-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">Clients Management</h3>
+                <p className="text-surface-500 dark:text-surface-400">Client management features coming soon</p>
+              </div>
+            </main>
+          )}
+
+          {activeSection === 'projects' && (
+            <main className="p-4 lg:p-8">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl p-8 shadow-card border border-surface-200 dark:border-surface-700 text-center">
+                <ApperIcon name="FolderOpen" className="h-16 w-16 text-surface-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">Project Management</h3>
+                <p className="text-surface-500 dark:text-surface-400">Project management features coming soon</p>
+              </div>
+            </main>
+          )}
+
+          {activeSection === 'keywords' && (
+            <main className="p-4 lg:p-8">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl p-8 shadow-card border border-surface-200 dark:border-surface-700 text-center">
+                <ApperIcon name="Search" className="h-16 w-16 text-surface-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">Keyword Research</h3>
+                <p className="text-surface-500 dark:text-surface-400">Keyword research tools coming soon</p>
+              </div>
+            </main>
+          )}
+
+          {activeSection === 'reports' && (
+            <main className="p-4 lg:p-8">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl p-8 shadow-card border border-surface-200 dark:border-surface-700 text-center">
+                <ApperIcon name="FileText" className="h-16 w-16 text-surface-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">Reports & Analytics</h3>
+                <p className="text-surface-500 dark:text-surface-400">Reporting features coming soon</p>
+              </div>
+            </main>
+          )}
             {/* Quick Actions */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
