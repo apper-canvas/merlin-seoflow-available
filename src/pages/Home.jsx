@@ -16,9 +16,11 @@ const Home = () => {
     { id: 'dashboard', label: 'Dashboard', icon: 'BarChart3' },
     { id: 'clients', label: 'Clients', icon: 'Users' },
     { id: 'projects', label: 'Projects', icon: 'FolderOpen' },
+    { id: 'deals', label: 'Deals', icon: 'Target' },
     { id: 'keywords', label: 'Keywords', icon: 'Search' },
     { id: 'reports', label: 'Reports', icon: 'FileText' }
   ]
+
 
   const kpiCards = [
     { title: 'Total Clients', value: '47', change: '+12%', trend: 'up', icon: 'Users', color: 'blue' },
@@ -52,7 +54,13 @@ const Home = () => {
               {menuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setActiveSection(item.id)}
+                  onClick={() => {
+                    if (item.id === 'deals') {
+                      window.location.href = '/deals'
+                    } else {
+                      setActiveSection(item.id)
+                    }
+                  }}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
                     activeSection === item.id
                       ? 'bg-primary text-white shadow-card'
@@ -64,6 +72,7 @@ const Home = () => {
                 </button>
               ))}
             </nav>
+
           </div>
         </motion.aside>
 
