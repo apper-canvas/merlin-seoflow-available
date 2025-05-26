@@ -385,7 +385,8 @@ const Deals = () => {
             </div>
 
             <div className="overflow-x-auto pipeline-horizontal">
-              <div className="grid grid-cols-6 gap-6 min-w-max" style={{ gridTemplateColumns: 'repeat(6, minmax(300px, 1fr))' }}">
+              <div className="grid grid-cols-6 gap-6 min-w-max" style={{ gridTemplateColumns: 'repeat(6, minmax(300px, 1fr))' }}>
+
 
                 {stages.map((stage) => {
                   const stageDeals = getStageDeals(stage.id)
