@@ -116,6 +116,49 @@
   .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: #64748b;
   }
+  /* Horizontal scrollbar styles for pipeline */
+  .pipeline-horizontal {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+
+  .pipeline-horizontal::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .pipeline-horizontal::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  .pipeline-horizontal::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .pipeline-horizontal::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Dark mode horizontal scrollbar */
+  .dark .pipeline-horizontal {
+    scrollbar-color: #475569 #334155;
+  }
+
+  .dark .pipeline-horizontal::-webkit-scrollbar-track {
+    background: #334155;
+  }
+
+  .dark .pipeline-horizontal::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+
+  .dark .pipeline-horizontal::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+
+
 
   /* Pipeline column styles */
   .pipeline-column {
