@@ -838,7 +838,6 @@ const Clients = () => {
                     {visibleColumns.map((column) => renderCell(client, column, rowIndex))}
                   </tr>
                 ))
-                ))}
               </tbody>
             </table>
           </div>
