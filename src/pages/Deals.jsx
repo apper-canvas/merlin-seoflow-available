@@ -476,9 +476,6 @@ const Deals = () => {
                 })}
               </div>
             </div>
-
-            </div>
-          </div>
         </div>
 
         {/* Add Deal Modal */}
