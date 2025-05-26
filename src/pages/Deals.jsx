@@ -352,7 +352,8 @@ const Deals = () => {
                         </span>
                       </div>
 
-                      <div className="space-y-3 min-h-[200px]">
+                      <div className="space-y-3 min-h-[200px] max-h-[calc(70vh-120px)] overflow-y-auto scrollbar-thin pipeline-column">
+
                         {stageDeals.map((deal) => (
                           <motion.div
                             key={deal.id}
