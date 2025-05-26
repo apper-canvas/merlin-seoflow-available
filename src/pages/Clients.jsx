@@ -838,10 +838,10 @@ const Clients = () => {
                     {visibleColumns.map((column) => renderCell(client, column, rowIndex))}
                   </tr>
                 ))
+                ))}
               </tbody>
             </table>
           </div>
-
 
           {finalClients.length === 0 && (
             <div className="text-center py-12">
