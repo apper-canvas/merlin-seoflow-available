@@ -437,6 +437,8 @@ const Deals = () => {
                                 >
                                   <ApperIcon name="Edit2" className="h-3 w-3" />
                                 </button>
+                                <button 
+
 
                                   onClick={() => deleteDeal(deal.id)}
                                   className="p-1 text-surface-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
