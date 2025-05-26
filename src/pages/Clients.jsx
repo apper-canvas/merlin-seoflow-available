@@ -837,7 +837,12 @@ const Clients = () => {
                     </td>
                     {visibleColumns.map((column) => renderCell(client, column, rowIndex))}
                   </tr>
+                ))
+              </tbody>
+
                 ))}
+
+          </div>
 
             </table>
             {finalClients.length === 0 && (
