@@ -6,6 +6,9 @@ import ApperIcon from '../components/ApperIcon'
 const Deals = () => {
   const [darkMode, setDarkMode] = useState(false)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [editingDeal, setEditingDeal] = useState(null)
+
   const [selectedDeal, setSelectedDeal] = useState(null)
   const [draggedDeal, setDraggedDeal] = useState(null)
 
@@ -174,6 +177,60 @@ const Deals = () => {
     setDeals(deals.filter(deal => deal.id !== dealId))
     toast.success("Deal deleted successfully!")
   }
+
+  const startEditDeal = (deal) => {
+    setEditingDeal(deal)
+    setFormData({
+      title: deal.title,
+      clientName: deal.clientName,
+      value: deal.value,
+      stage: deal.stage,
+      probability: deal.probability,
+      expectedCloseDate: deal.expectedCloseDate,
+      contactPerson: deal.contactPerson,
+      email: deal.email,
+      phone: deal.phone,
+      notes: deal.notes
+    })
+    setShowEditForm(true)
+  }
+
+  const handleEditSubmit = (e) => {
+    e.preventDefault()
+    
+    if (!formData.title || !formData.clientName || !formData.value) {
+      toast.error("Please fill in all required fields")
+      return
+    }
+
+    const updatedDeal = {
+      ...editingDeal,
+      ...formData,
+      value: parseFloat(formData.value),
+      lastActivity: new Date().toISOString().split('T')[0]
+    }
+
+    setDeals(deals.map(deal => 
+      deal.id === editingDeal.id ? updatedDeal : deal
+    ))
+    toast.success("Deal updated successfully!")
+    
+    setFormData({
+      title: '',
+      clientName: '',
+      value: '',
+      stage: 'lead',
+      probability: 20,
+      expectedCloseDate: '',
+      contactPerson: '',
+      email: '',
+      phone: '',
+      notes: ''
+    })
+    setShowEditForm(false)
+    setEditingDeal(null)
+  }
+
 
   const handleDragStart = (e, deal) => {
     setDraggedDeal(deal)
@@ -375,6 +432,12 @@ const Deals = () => {
                                   <ApperIcon name="Eye" className="h-3 w-3" />
                                 </button>
                                 <button 
+                                  onClick={() => startEditDeal(deal)}
+                                  className="p-1 text-surface-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                                >
+                                  <ApperIcon name="Edit2" className="h-3 w-3" />
+                                </button>
+
                                   onClick={() => deleteDeal(deal.id)}
                                   className="p-1 text-surface-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                 >
@@ -601,6 +664,241 @@ const Deals = () => {
           )}
         </AnimatePresence>
 
+        {/* Edit Deal Modal */}
+        <AnimatePresence>
+          {showEditForm && editingDeal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+              onClick={() => {
+                setShowEditForm(false)
+                setEditingDeal(null)
+                setFormData({
+                  title: '',
+                  clientName: '',
+                  value: '',
+                  stage: 'lead',
+                  probability: 20,
+                  expectedCloseDate: '',
+                  contactPerson: '',
+                  email: '',
+                  phone: '',
+                  notes: ''
+                })
+              }}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-surface-900 dark:text-white">Edit Deal</h3>
+                  <button
+                    onClick={() => {
+                      setShowEditForm(false)
+                      setEditingDeal(null)
+                      setFormData({
+                        title: '',
+                        clientName: '',
+                        value: '',
+                        stage: 'lead',
+                        probability: 20,
+                        expectedCloseDate: '',
+                        contactPerson: '',
+                        email: '',
+                        phone: '',
+                        notes: ''
+                      })
+                    }}
+                    className="p-2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 rounded-lg"
+                  >
+                    <ApperIcon name="X" className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleEditSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Deal Title *
+                      </label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Client Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="clientName"
+                        value={formData.clientName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Deal Value ($) *
+                      </label>
+                      <input
+                        type="number"
+                        name="value"
+                        value={formData.value}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Stage
+                      </label>
+                      <select
+                        name="stage"
+                        value={formData.stage}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      >
+                        {stages.map((stage) => (
+                          <option key={stage.id} value={stage.id}>{stage.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Probability (%)
+                      </label>
+                      <input
+                        type="number"
+                        name="probability"
+                        value={formData.probability}
+                        onChange={handleInputChange}
+                        min="0"
+                        max="100"
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Expected Close Date
+                      </label>
+                      <input
+                        type="date"
+                        name="expectedCloseDate"
+                        value={formData.expectedCloseDate}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Contact Person
+                      </label>
+                      <input
+                        type="text"
+                        name="contactPerson"
+                        value={formData.contactPerson}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Phone
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Notes
+                      </label>
+                      <textarea
+                        name="notes"
+                        value={formData.notes}
+                        onChange={handleInputChange}
+                        rows="3"
+                        className="w-full px-4 py-2 bg-surface-50 dark:bg-surface-700 border border-surface-200 dark:border-surface-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowEditForm(false)
+                        setEditingDeal(null)
+                        setFormData({
+                          title: '',
+                          clientName: '',
+                          value: '',
+                          stage: 'lead',
+                          probability: 20,
+                          expectedCloseDate: '',
+                          contactPerson: '',
+                          email: '',
+                          phone: '',
+                          notes: ''
+                        })
+                      }}
+                      className="flex-1 px-4 py-2 text-surface-600 dark:text-surface-300 bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 rounded-lg font-medium transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition-colors"
+                    >
+                      Update Deal
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+
         {/* Deal Detail Modal */}
         <AnimatePresence>
           {selectedDeal && (
@@ -713,13 +1011,12 @@ const Deals = () => {
                       Close
                     </button>
                     <button
-                      onClick={() => {
-                        toast.info("Edit functionality coming soon!")
-                      }}
+                      onClick={() => startEditDeal(selectedDeal)}
                       className="flex-1 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition-colors"
                     >
                       Edit Deal
                     </button>
+
                   </div>
                 </div>
               </motion.div>
