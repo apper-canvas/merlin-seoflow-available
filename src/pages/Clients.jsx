@@ -122,8 +122,6 @@ const Clients = () => {
     return matchesSearch && matchesFilter
   })
 
-  const handleCellClick = (rowIndex, columnKey) => {
-
   // Close context menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -146,6 +144,9 @@ const Clients = () => {
     }
   }, [contextMenu.visible])
 
+  const handleCellClick = (rowIndex, columnKey) => {
+
+
     const cellId = `${rowIndex}-${columnKey}`
     setSelectedCell(cellId)
     
@@ -167,7 +168,25 @@ const Clients = () => {
       
       if (clientIndex !== -1) {
         const updatedClients = [...clients]
-        const column = columns.find(col => col.key === columnKey)
+        
+        let value = editValue
+        if (column.type === 'number') {
+          value = parseFloat(editValue) || 0
+        }
+        
+        updatedClients[clientIndex] = {
+          ...updatedClients[clientIndex],
+          [columnKey]: value
+        }
+        
+        setClients(updatedClients)
+        toast.success('Cell updated successfully')
+      }
+      
+      setEditingCell(null)
+      setEditValue('')
+    }
+  }
 
   // Sort clients based on current sort settings
   const sortedClients = [...filteredClients].sort((a, b) => {
@@ -182,19 +201,136 @@ const Clients = () => {
     return sortDirection === 'asc' ? comparison : -comparison
   })
 
-        
-        if (column.type === 'number') {
-          value = parseFloat(editValue) || 0
-        }
-        
-        updatedClients[clientIndex] = {
-          ...updatedClients[clientIndex],
-          [columnKey]: value
-        }
-        
-        setClients(updatedClients)
-        toast.success('Cell updated successfully')
-      }
+  const finalClients = sortedClients
+
+  // Get visible columns
+  const visibleColumns = columns.filter(col => col.visible)
+
+  const handleColumnRightClick = (e, column) => {
+    e.preventDefault()
+    const rect = containerRef.current.getBoundingClientRect()
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      column: column
+    })
+  }
+
+  const handleSort = (columnKey, direction) => {
+    setSortColumn(columnKey)
+    setSortDirection(direction)
+    setContextMenu({ visible: false, x: 0, y: 0, column: null })
+    toast.success(`Sorted by ${columns.find(col => col.key === columnKey)?.label} (${direction}ending)`)
+  }
+
+  const toggleColumnVisibility = (columnKey) => {
+    const updatedColumns = columns.map(col => 
+      col.key === columnKey ? { ...col, visible: !col.visible } : col
+    )
+    setColumns(updatedColumns)
+    setContextMenu({ visible: false, x: 0, y: 0, column: null })
+    const column = columns.find(col => col.key === columnKey)
+    toast.success(`${column.label} column ${column.visible ? 'hidden' : 'shown'}`)
+  }
+
+  const toggleColumnFreeze = (columnKey) => {
+    const updatedColumns = columns.map(col => 
+      col.key === columnKey ? { ...col, frozen: !col.frozen } : col
+    )
+    setColumns(updatedColumns)
+    setContextMenu({ visible: false, x: 0, y: 0, column: null })
+    const column = columns.find(col => col.key === columnKey)
+    toast.success(`${column.label} column ${column.frozen ? 'unfrozen' : 'frozen'}`)
+  }
+
+  const insertColumn = (afterColumnKey, position = 'after') => {
+    const newColumn = {
+      key: `custom_${Date.now()}`,
+      label: 'New Column',
+      width: 150,
+      type: 'text',
+      visible: true,
+      frozen: false
+    }
+    
+    const targetIndex = columns.findIndex(col => col.key === afterColumnKey)
+    const insertIndex = position === 'after' ? targetIndex + 1 : targetIndex
+    
+    const updatedColumns = [...columns]
+    updatedColumns.splice(insertIndex, 0, newColumn)
+    setColumns(updatedColumns)
+    
+    // Add the column to all existing clients
+    const updatedClients = clients.map(client => ({ ...client, [newColumn.key]: '' }))
+    setClients(updatedClients)
+    
+    setContextMenu({ visible: false, x: 0, y: 0, column: null })
+    toast.success('New column inserted')
+  }
+
+  const deleteColumn = (columnKey) => {
+    if (columns.length <= 1) {
+      toast.warning('Cannot delete the last column')
+      return
+    }
+
+    if (window.confirm('Are you sure you want to delete this column? This will remove all data in this column.')) {
+      const updatedColumns = columns.filter(col => col.key !== columnKey)
+      setColumns(updatedColumns)
+      
+      // Remove the column from all clients
+      const updatedClients = clients.map(client => {
+        const { [columnKey]: removed, ...rest } = client
+        return rest
+      })
+      setClients(updatedClients)
+      
+      setContextMenu({ visible: false, x: 0, y: 0, column: null })
+      toast.success('Column deleted')
+    }
+  }
+
+  const changeColumnType = (columnKey, newType) => {
+    const updatedColumns = columns.map(col => 
+      col.key === columnKey ? { ...col, type: newType } : col
+    )
+    setColumns(updatedColumns)
+    setContextMenu({ visible: false, x: 0, y: 0, column: null })
+    toast.success('Column type changed')
+  }
+
+  const adjustColumnWidth = (columnKey, newWidth) => {
+    const updatedColumns = columns.map(col => 
+      col.key === columnKey ? { ...col, width: Math.max(50, Math.min(500, newWidth)) } : col
+    )
+    setColumns(updatedColumns)
+    toast.success('Column width adjusted')
+  }
+
+  const clearColumnData = (columnKey) => {
+    if (window.confirm('Are you sure you want to clear all data in this column?')) {
+      const updatedClients = clients.map(client => ({ ...client, [columnKey]: '' }))
+      setClients(updatedClients)
+      setContextMenu({ visible: false, x: 0, y: 0, column: null })
+      toast.success('Column data cleared')
+    }
+  }
+
+  const showAllColumns = () => {
+    const updatedColumns = columns.map(col => ({ ...col, visible: true }))
+    setColumns(updatedColumns)
+    setContextMenu({ visible: false, x: 0, y: 0, column: null })
+    toast.success('All columns shown')
+  }
+
+  const renderCell = (client, column, rowIndex) => {
+    const cellId = `${rowIndex}-${column.key}`
+    const isSelected = selectedCell === cellId
+    const isEditing = editingCell === cellId
+    const value = client[column.key]
+
+
   const finalClients = sortedClients
 
 
@@ -334,126 +470,66 @@ const Clients = () => {
     window.URL.revokeObjectURL(url)
     toast.success('Data exported successfully')
   }
-
-  const renderCell = (client, column, rowIndex) => {
-    const cellId = `${rowIndex}-${column.key}`
-
-  const handleColumnRightClick = (e, column) => {
-    e.preventDefault()
-    const rect = containerRef.current.getBoundingClientRect()
-    setContextMenu({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-      column: column
-    })
-  }
-
-  const handleSort = (columnKey, direction) => {
-    setSortColumn(columnKey)
-    setSortDirection(direction)
-    setContextMenu({ visible: false, x: 0, y: 0, column: null })
-    toast.success(`Sorted by ${columns.find(col => col.key === columnKey)?.label} (${direction}ending)`)
-  }
-
-  const toggleColumnVisibility = (columnKey) => {
-    const updatedColumns = columns.map(col => 
-      col.key === columnKey ? { ...col, visible: !col.visible } : col
+    return (
+      <td
+        key={column.key}
+        className={`sheets-cell ${
+          isSelected ? 'selected' : ''
+        } ${
+          isEditing ? 'editing' : ''
+        } ${
+          column.frozen ? 'column-frozen' : ''
+        }`}
+        style={{ width: column.width }}
+        onClick={() => handleCellClick(rowIndex, column.key)}
+        onDoubleClick={() => startEditing(rowIndex, column.key)}
+      >
+        {isEditing ? (
+          column.type === 'select' ? (
+            <select
+              ref={inputRef}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={stopEditing}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') stopEditing()
+                if (e.key === 'Escape') {
+                  setEditingCell(null)
+                  setEditValue('')
+                }
+              }}
+              className="w-full bg-transparent border-none outline-none"
+            >
+              {column.options.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              ref={inputRef}
+              type={column.type}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={stopEditing}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') stopEditing()
+                if (e.key === 'Escape') {
+                  setEditingCell(null)
+                  setEditValue('')
+                }
+              }}
+            />
+          )
+        ) : (
+          <span>
+            {column.type === 'number' && column.key === 'value' 
+              ? `$${Number(value).toLocaleString()}` 
+              : String(value || '')
+            }
+          </span>
+        )}
+      </td>
     )
-    setColumns(updatedColumns)
-    setContextMenu({ visible: false, x: 0, y: 0, column: null })
-    const column = columns.find(col => col.key === columnKey)
-    toast.success(`${column.label} column ${column.visible ? 'hidden' : 'shown'}`)
-  }
-
-  const toggleColumnFreeze = (columnKey) => {
-    const updatedColumns = columns.map(col => 
-      col.key === columnKey ? { ...col, frozen: !col.frozen } : col
-    )
-    setColumns(updatedColumns)
-    setContextMenu({ visible: false, x: 0, y: 0, column: null })
-    const column = columns.find(col => col.key === columnKey)
-    toast.success(`${column.label} column ${column.frozen ? 'unfrozen' : 'frozen'}`)
-  }
-
-  const insertColumn = (afterColumnKey, position = 'after') => {
-    const newColumn = {
-      key: `custom_${Date.now()}`,
-      label: 'New Column',
-      width: 150,
-      type: 'text',
-      visible: true,
-      frozen: false
-    }
-    
-    const targetIndex = columns.findIndex(col => col.key === afterColumnKey)
-    const insertIndex = position === 'after' ? targetIndex + 1 : targetIndex
-    
-    const updatedColumns = [...columns]
-    updatedColumns.splice(insertIndex, 0, newColumn)
-    setColumns(updatedColumns)
-    
-    // Add the column to all existing clients
-    const updatedClients = clients.map(client => ({ ...client, [newColumn.key]: '' }))
-    setClients(updatedClients)
-    
-    setContextMenu({ visible: false, x: 0, y: 0, column: null })
-    toast.success('New column inserted')
-  }
-
-  const deleteColumn = (columnKey) => {
-    if (columns.length <= 1) {
-      toast.warning('Cannot delete the last column')
-      return
-    }
-
-    if (window.confirm('Are you sure you want to delete this column? This will remove all data in this column.')) {
-      const updatedColumns = columns.filter(col => col.key !== columnKey)
-      setColumns(updatedColumns)
-      
-      // Remove the column from all clients
-      const updatedClients = clients.map(client => {
-        const { [columnKey]: removed, ...rest } = client
-        return rest
-      })
-      setClients(updatedClients)
-      
-      setContextMenu({ visible: false, x: 0, y: 0, column: null })
-      toast.success('Column deleted')
-    }
-  }
-
-  const changeColumnType = (columnKey, newType) => {
-    const updatedColumns = columns.map(col => 
-      col.key === columnKey ? { ...col, type: newType } : col
-    )
-    setColumns(updatedColumns)
-    setContextMenu({ visible: false, x: 0, y: 0, column: null })
-    toast.success('Column type changed')
-  }
-
-  const adjustColumnWidth = (columnKey, newWidth) => {
-    const updatedColumns = columns.map(col => 
-      col.key === columnKey ? { ...col, width: Math.max(50, Math.min(500, newWidth)) } : col
-    )
-    setColumns(updatedColumns)
-    toast.success('Column width adjusted')
-  }
-
-  const clearColumnData = (columnKey) => {
-    if (window.confirm('Are you sure you want to clear all data in this column?')) {
-      const updatedClients = clients.map(client => ({ ...client, [columnKey]: '' }))
-      setClients(updatedClients)
-      setContextMenu({ visible: false, x: 0, y: 0, column: null })
-      toast.success('Column data cleared')
-    }
-  }
-
-  const showAllColumns = () => {
-    const updatedColumns = columns.map(col => ({ ...col, visible: true }))
-    setColumns(updatedColumns)
-    setContextMenu({ visible: false, x: 0, y: 0, column: null })
-    toast.success('All columns shown')
   }
 
   // Column Context Menu Component
@@ -613,85 +689,7 @@ const Clients = () => {
     )
   }
 
-    const isSelected = selectedCell === cellId
-    const isEditing = editingCell === cellId
 
-    return (
-      <td
-        key={column.key}
-        className={`sheets-cell ${
-          isSelected ? 'selected' : ''
-        } ${
-          isEditing ? 'editing' : ''
-        }`}
-        style={{ width: column.width }}
-        onClick={() => handleCellClick(rowIndex, column.key)}
-        onDoubleClick={() => startEditing(rowIndex, column.key)}
-      >
-        {isEditing ? (
-    return (
-      <td
-        key={column.key}
-        className={`sheets-cell ${
-          isSelected ? 'selected' : ''
-        } ${
-          isEditing ? 'editing' : ''
-        } ${
-          column.frozen ? 'column-frozen' : ''
-        }`}
-        style={{ width: column.width }}
-        onClick={() => handleCellClick(rowIndex, column.key)}
-        onDoubleClick={() => startEditing(rowIndex, column.key)}
-      >
-        {isEditing ? (
-          column.type === 'select' ? (
-            <select
-              ref={inputRef}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={stopEditing}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') stopEditing()
-                if (e.key === 'Escape') {
-                  setEditingCell(null)
-                  setEditValue('')
-                }
-              }}
-              className="w-full bg-transparent border-none outline-none"
-            >
-              {column.options.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-          ) : (
-            <input
-              ref={inputRef}
-              type={column.type}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={stopEditing}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') stopEditing()
-                if (e.key === 'Escape') {
-                  setEditingCell(null)
-                  setEditValue('')
-                }
-              }}
-            />
-          )
-        ) : (
-          <span>
-            {column.type === 'number' && column.key === 'value' 
-              ? `$${Number(value).toLocaleString()}` 
-              : String(value || '')
-            }
-          </span>
-        )}
-      </td>
-    )
-  }
-
-  }
 
   return (
     <div className="min-h-screen bg-surface-50 dark:bg-surface-900" onKeyDown={handleKeyDown} tabIndex={0}>
@@ -783,8 +781,9 @@ const Clients = () => {
                       onChange={selectAllRows}
                       className="rounded"
                     />
+                  </th>
                   {visibleColumns.map((column) => (
-                    <th 
+
                       key={column.key} 
                       className={`sheets-header ${
                         column.frozen ? 'column-frozen' : ''
@@ -821,7 +820,8 @@ const Clients = () => {
 
                 </tr>
               </thead>
-                {finalClients.map((client, rowIndex) => (
+              <tbody>
+
                   <tr 
                     key={client.id}
                     className={selectedRows.has(client.id) ? 'row-selected' : ''}
@@ -838,8 +838,6 @@ const Clients = () => {
                   </tr>
                 ))}
 
-                ))}
-              </tbody>
             </table>
             {finalClients.length === 0 && (
               <div className="text-center py-12">
@@ -853,11 +851,6 @@ const Clients = () => {
               </div>
             )}
 
-                  }
-                </p>
-              </div>
-            )}
-          </div>
 
           {/* Context Menu */}
           <ColumnContextMenu />
