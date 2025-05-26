@@ -253,36 +253,6 @@ const Home = () => {
               </div>
             </main>
           )}
-            {/* Quick Actions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="bg-white dark:bg-surface-800 rounded-2xl p-6 lg:p-8 shadow-card border border-surface-200 dark:border-surface-700"
-            >
-              <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-6">Quick Actions</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { title: 'New Client', icon: 'UserPlus', color: 'bg-blue-500' },
-                  { title: 'Create Project', icon: 'Plus', color: 'bg-green-500' },
-                  { title: 'Add Keywords', icon: 'Search', color: 'bg-yellow-500' },
-                  { title: 'Generate Report', icon: 'FileText', color: 'bg-purple-500' }
-                ].map((action) => (
-                  <button
-                    key={action.title}
-                    className="flex flex-col items-center p-6 rounded-xl border-2 border-dashed border-surface-300 dark:border-surface-600 hover:border-primary hover:bg-primary/5 transition-all duration-200 group"
-                  >
-                    <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                      <ApperIcon name={action.icon} className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="font-medium text-surface-700 dark:text-surface-300 group-hover:text-primary transition-colors">
-                      {action.title}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          </main>
         </div>
       </div>
     </div>
